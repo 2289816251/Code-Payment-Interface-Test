@@ -1,0 +1,115 @@
+import { ref, computed } from 'vue'
+import { defineStore } from 'pinia'
+import api from '@/api/index'
+import { generateOrderId } from '@/hooks/useGenerateOrderId'
+import { generateSign } from '@/hooks/useMD5'
+import { getOrdersList, setOrdersList } from '@/hooks/useLocalStorageOrders'
+import dayjs from 'dayjs'
+import { message } from 'ant-design-vue';
+
+export const useHomeStore = defineStore('home', {
+  state: () => {
+    return {
+      // 支付方式
+      paymentMethods: [
+        {
+          id: 0,
+          title: "支付宝",
+          image: "/src/assets/images/zfb.png",
+          type: "alipay",
+          state: 1,
+        },
+        {
+          id: 1,
+          title: "微信",
+          image: "/src/assets/images/wx.png",
+          type: "wxpay",
+          state: 0,
+        },
+      ],
+      // 当前订单数据
+      ordersData: {},
+      // 支付信息
+      paymentInfo: {},
+      // 订单弹窗是否打开
+      payModelIsShow: false,
+      // 计时器
+      timer: null,
+      // 订单状态
+      orderStatus: 1
+    }
+  },
+  actions: {
+    // 切换支付方式
+    switchPaymentMethods(item) {
+      this.paymentMethods.forEach((e) => {
+        e.state = 0;
+        if (e.id == item.id) e.state = 1;
+      });
+    },
+    // API支付
+    async paymentViaAPI(data) {
+      let newData = this.organizingTheData(data)
+      try {
+        let result = await api.getUnifiedOrderPayment(newData)
+        const { trade_no, money, out_trade_no, qrcode, urlscheme, orderCreationTime, msg } = { ...result }
+        // 保存当前订单数据
+        this.ordersData = Object.assign({}, data, {trade_no, money, out_trade_no, qrcode, urlscheme, orderCreationTime});
+        // 整理当前支付信息
+        this.paymentInfo = this.paymentMethods.filter((item, index) => {
+          return item.type == this.ordersData.type;
+        })[0];
+        // 打开支付弹窗
+        this.payModelIsShow = true
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    // 整理数据
+    organizingTheData(data) {
+      // 添加支付方式
+      data.type = this.paymentMethods.filter((item, index) => {
+        return item.state == 1
+      })[0].type
+
+      return data
+    },
+    // 获取支付渠道列表
+    async getObtainPaymentChannelList() {
+      let data = {
+        pid: this.unifiedOrderPaymentData.pid,
+        timestamp: dayjs().unix().toString()
+      }
+      data.sign = generateSign(data, this.privateKey)
+
+      try {
+        let result = await api.obtainPaymentChannelList(data)
+        this.paymentChannelList = result.data
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    // 查询订单状态
+    queryOrderStatus() {
+      this.timer = setInterval(async () => {
+        try {
+          let result = await api.queryOrderStatus(dayjs().unix(), { order_id: this.ordersData.trade_no })
+          const { data } = { ...result }
+          console.log(data)
+          if (data.status == 3) { // 商家关闭订单
+            this.orderStatus = data.status
+            message.warning('订单已关闭，感谢您的支持')
+            clearInterval(this.timer)
+          } else if (data.status == 4) { // 支付超时
+            this.orderStatus = data.status
+            message.warning('订单支付超时')
+            clearInterval(this.timer)
+          }
+        } catch (error) {
+          clearInterval(this.timer)
+          console.error(error)
+        }
+      }, 1000)
+    }
+  }
+})
