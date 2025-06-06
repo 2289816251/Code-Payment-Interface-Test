@@ -163,6 +163,7 @@ export const useHomeStore = defineStore('home', {
     },
     // 修改订单状态
     async updateOrderStatus(status) {
+      console.log(status)
       let data = {
         out_trade_no: this.ordersData.out_trade_no,
         uid: getToken(),
@@ -202,7 +203,11 @@ export const useHomeStore = defineStore('home', {
         clearInterval(this.timer)
         // 修改订单状态
         if (this.orderStatus == 0) {
+
           this.updateOrderStatus('2')
+        } else {
+          // 修改订单状态
+          this.updateOrderStatus(this.orderStatus)
         }
         // 获取订单数据
         this.getOrderDataList()

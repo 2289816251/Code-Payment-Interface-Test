@@ -18,7 +18,7 @@ function deleteOrderData(data) {
     })
 }
 // 查询订单状态
-function queryOrderStatus(data) {
+function queryOrderStatus(timer, data) {
     return request.post(`${baseURL}/testGetOrderStatus`, data)
 }
 // 通过订单号和用户id去修改订单状态

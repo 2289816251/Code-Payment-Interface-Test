@@ -202,7 +202,11 @@ export const useHomeStore = defineStore('home', {
         clearInterval(this.timer)
         // 修改订单状态
         if (this.orderStatus == 0) {
+          console.log('订单已关闭')
           this.updateOrderStatus('2')
+        } else {
+          console.log(`订单设置为：`+this.orderStatus)
+          this.updateOrderStatus(this.orderStatus)
         }
         // 获取订单数据
         this.getOrderDataList()

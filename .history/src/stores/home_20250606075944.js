@@ -163,6 +163,7 @@ export const useHomeStore = defineStore('home', {
     },
     // 修改订单状态
     async updateOrderStatus(status) {
+      console.log(status)
       let data = {
         out_trade_no: this.ordersData.out_trade_no,
         uid: getToken(),
@@ -202,7 +203,11 @@ export const useHomeStore = defineStore('home', {
         clearInterval(this.timer)
         // 修改订单状态
         if (this.orderStatus == 0) {
+          console.log('订单已关闭')
           this.updateOrderStatus('2')
+        } else {
+          console.log(`订单设置为：`+this.orderStatus)
+          this.updateOrderStatus(this.orderStatus)
         }
         // 获取订单数据
         this.getOrderDataList()

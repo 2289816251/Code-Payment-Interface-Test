@@ -207,22 +207,22 @@ const isType = (type)=>{
 }
 // 判断状态
 const isStatus = (status)=>{
-    if(status == '0'){
+    if(status == '1'){
         return {
             text:'待支付',
             color:'default'
         }
-    }else if(status == '1'){
+    }else if(status == '2'){
         return {
             text:'已支付',
             color:'success'
         }
-    }else if(status == '2'){
+    }else if(status == '3'){
         return {
             text:'订单已关闭',
             color:'error'
         }
-    }else if(status == '3'){
+    }else if(status == '4'){
         return {
             text:'支付超时',
             color:'warning'

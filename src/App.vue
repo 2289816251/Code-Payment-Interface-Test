@@ -83,6 +83,7 @@
   <OrderPaymentModal
     v-if="homeStore.payModelIsShow"
     :open="homeStore.payModelIsShow"
+    @closeModel="homeStore.closeModel('payModelIsShow')"
     :orderdata="homeStore.ordersData"
     :paymentInfo="homeStore.paymentInfo"
     :orderStatus="homeStore.orderStatus"
