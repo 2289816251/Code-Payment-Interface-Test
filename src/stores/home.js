@@ -102,7 +102,6 @@ export const useHomeStore = defineStore('home', {
         try {
           let result = await api.queryOrderStatus({ out_trade_no: this.ordersData.out_trade_no, uid: getToken() })
           const { msg, data } = { ...result }
-          console.log(result)
           if (data.status == 0) {
             return
           } else {
