@@ -8,7 +8,6 @@ import { filterMatchingKeys } from '@/hooks/useTool'
 import { message } from 'ant-design-vue';
 // 在组件中导入图片
 import zfbImg from '@/assets/images/zfb.png';
-import wxImg from '@/assets/images/wx.png';
 
 export const useHomeStore = defineStore('home', {
   state: () => {
@@ -25,7 +24,7 @@ export const useHomeStore = defineStore('home', {
         {
           id: 1,
           title: "微信",
-          image: wxImg,
+          image: "/src/assets/images/wx.png",
           type: "wxpay",
           state: 0,
         },
