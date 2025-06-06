@@ -103,7 +103,7 @@
       <div class="bottom">
         <ScanOutlined
           :style="{
-            color: props.paymentInfo.type == 'alipay' ? '#027AFF' : '#1AAD19',
+            color: returnPayTypeColor(props.paymentInfo.type),
           }"
         />
         <div class="text">
@@ -117,6 +117,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, reactive } from "vue";
+import { returnPayTypeColor } from "@/hooks/useTool";
 import {
   ScanOutlined,
   FrownFilled,
@@ -127,17 +128,17 @@ import { useHomeStore } from "@/stores/home";
 const homeStore = useHomeStore();
 
 // 自定义事件
-const emit = defineEmits(['closeModel'])
+const emit = defineEmits(["closeModel"]);
 
 let countdown = reactive(["05", "00"]);
 
-let timer = ref(null)
+let timer = ref(null);
 
 const props = defineProps({
   open: Boolean,
   orderdata: Object,
   paymentInfo: Object,
-  orderStatus: Number
+  orderStatus: Number,
 });
 // 倒计时
 const startCountdown = (duration, onTick, onComplete) => {
@@ -158,7 +159,7 @@ const startCountdown = (duration, onTick, onComplete) => {
   return {
     stop: () => {
       clearInterval(intervalId);
-    }
+    },
   };
 };
 
@@ -189,9 +190,9 @@ onMounted(() => {
   );
   homeStore.queryOrderStatus();
 });
-onUnmounted(()=>{
-  timer.stop()
-})
+onUnmounted(() => {
+  timer.stop();
+});
 </script>
 
 <style scoped>

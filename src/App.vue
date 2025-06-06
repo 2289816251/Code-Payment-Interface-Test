@@ -1,8 +1,14 @@
 <template>
   <div class="title">
     <div class="text">请选择商品并下单</div>
-    <div class="historicalOrder" @click="homeStore.openModel('OrderDataListDrawerIsShow')">
-      <a-badge :count="homeStore.historicalOrderList.length" :overflow-count="99">
+    <div
+      class="historicalOrder"
+      @click="homeStore.openModel('OrderDataListDrawerIsShow')"
+    >
+      <a-badge
+        :count="homeStore.historicalOrderList.length"
+        :overflow-count="99"
+      >
         <HistoryOutlined />
       </a-badge>
     </div>
@@ -65,7 +71,20 @@
       v-for="(item, index) in homeStore.paymentMethods"
       :key="index"
     >
-      <img :src="item.image" alt="加载失败！" />
+      <template v-if="item.type == 'alipay'">
+        <AlipayCircleOutlined
+          :style="{
+            color: returnPayTypeColor(item.type),
+          }"
+        />
+      </template>
+      <template v-if="item.type == 'wxpay'">
+        <WechatOutlined
+          :style="{
+            color: returnPayTypeColor(item.type),
+          }"
+        />
+      </template>
       <span>{{ item.title }}</span>
     </div>
   </div>
@@ -89,7 +108,14 @@
     :orderStatus="homeStore.orderStatus"
   />
   <!-- 订单列表抽屉 -->
-  <OrderDataListDrawer v-if="homeStore.OrderDataListDrawerIsShow" :open="homeStore.OrderDataListDrawerIsShow" :orderdata="homeStore.historicalOrderList" @deleteTableData="homeStore.openModel('deleteOrderDataModelIsShow',$event)" @refreshTableData="homeStore.getOrderDataList(true)" @closeModel="homeStore.closeModel('OrderDataListDrawerIsShow')"/>
+  <OrderDataListDrawer
+    v-if="homeStore.OrderDataListDrawerIsShow"
+    :open="homeStore.OrderDataListDrawerIsShow"
+    :orderdata="homeStore.historicalOrderList"
+    @deleteTableData="homeStore.openModel('deleteOrderDataModelIsShow', $event)"
+    @refreshTableData="homeStore.getOrderDataList(true)"
+    @closeModel="homeStore.closeModel('OrderDataListDrawerIsShow')"
+  />
   <!-- 删除订单确认弹窗 -->
   <DeleteOrderDataModal
     :open="homeStore.deleteOrderDataModelIsShow"
@@ -101,10 +127,16 @@
 
 <script setup>
 import { ref, reactive, watch, onMounted, h } from "vue";
-import { PayCircleOutlined, HistoryOutlined } from "@ant-design/icons-vue";
+import {
+  PayCircleOutlined,
+  HistoryOutlined,
+  AlipayCircleOutlined,
+  WechatOutlined,
+} from "@ant-design/icons-vue";
 import OrderPaymentModal from "@/components/OrderPaymentModal/index.vue";
 import DeleteOrderDataModal from "@/components/DeleteOrderDataModal/index.vue";
 import OrderDataListDrawer from "@/components/OrderDataListDrawer/index.vue";
+import { returnPayTypeColor } from "@/hooks/useTool";
 import { useHomeStore } from "@/stores/home";
 const homeStore = useHomeStore();
 // 引入随机生成商品hooks
@@ -196,6 +228,10 @@ onMounted(() => {
     border-radius: 4px;
     cursor: pointer;
     img {
+      width: 24px;
+      height: 24px;
+    }
+    :deep(svg) {
       width: 24px;
       height: 24px;
     }
